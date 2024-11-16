@@ -4,7 +4,7 @@
   "description": "backed for CRM and campaign management system",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "node app.js & node subscriber.js",
     "test": "npm test"
   },
   "author": "",
