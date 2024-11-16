@@ -3,6 +3,7 @@ logs
 *.log
 
 mysql.js
+trial.js
 
 npm-debug.log*
 yarn-debug.log*

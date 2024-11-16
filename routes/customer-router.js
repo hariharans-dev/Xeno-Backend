@@ -1,11 +1,7 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
+const { register } = require("../route-controller/customer-controller");
 const {
-  register,
-  googleregister,
-  login,
-  googlelogin,
-  session,
   authenticateJWT,
 } = require("../route-controller/authentication-controller");
 
@@ -13,17 +9,14 @@ const router = express.Router();
 
 const validateregister = [
   check("email").isEmail().withMessage("Please provide a valid email address"),
-  check("password")
+  check("name").exists().withMessage("Please provide a valid name"),
+  check("total_spending")
     .exists()
-    .withMessage("Password must be at least 6 characters"),
+    .withMessage("Please provide a valid spending data"),
+  check("visits").exists().withMessage("Please provide a valid visit count"),
+  check("last_visit").exists().withMessage("Please provide a last visit date"),
+  authenticateJWT,
 ];
-
-const validatelogin = [
-  check("email").isEmail().withMessage("Please provide a valid email address"),
-  check("password").exists().withMessage("Password is required"),
-];
-
-const validateBearerToken = [authenticateJWT];
 
 const handlevalidationErrors = (req, res, next) => {
   const errors = validationResult(req);
@@ -34,13 +27,5 @@ const handlevalidationErrors = (req, res, next) => {
 };
 
 router.post("/register", validateregister, handlevalidationErrors, register);
-
-router.post("/googleregister", googleregister);
-
-router.post("/login", validatelogin, handlevalidationErrors, login);
-
-router.post("/googlelogin", googlelogin);
-
-router.get("/session", validateBearerToken, handlevalidationErrors, session);
 
 module.exports = router;

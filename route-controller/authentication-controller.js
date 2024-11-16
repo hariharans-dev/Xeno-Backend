@@ -3,29 +3,25 @@ const { OAuth2Client } = require("google-auth-library");
 const bcrypt = require("bcryptjs");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const { User } = require("../data-controller/authentication-datacontroller");
+const { body } = require("express-validator");
 
-const {
-  fetchData,
-} = require("../data-controller/authentication-datacontroller");
-
-const login = async (req, res) => {
+const register = async (req, res) => {
   const { email, password } = req.body;
-  const user = {
-    email: "test@example.com",
-    password: "$2a$10$3E2f7lZg9hT1gkZmOfr/.n.P.sJp1iM1.5wYPjN9OTMjgqJtu.xjS",
-  };
 
-  if (user && (await bcrypt.compare(password, user.password))) {
-    const authToken = jwt.sign({ email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: process.env.USER_EXPIRE_TIME,
-    });
-    res.json({ token: authToken, user });
-  } else {
-    res.status(401).send("Invalid credentials");
+  try {
+    await User.createuser(email, password);
+    res.json({ body: "user created" });
+  } catch (error) {
+    if (error === "email exists") {
+      res.json({ body: "email already exists" });
+    } else {
+      res.status(500).json({ body: "internal server error" });
+    }
   }
 };
 
-const googleauth = async (req, res) => {
+const googleregister = async (req, res) => {
   const { token } = req.body;
 
   try {
@@ -35,29 +31,76 @@ const googleauth = async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    const email = { email: payload.email };
+    const email = payload.email;
+    const password = payload.sub;
 
-    const authToken = jwt.sign(email, process.env.JWT_SECRET, {
-      expiresIn: process.env.USER_EXPIRE_TIME,
+    await User.createuser(email, password);
+    res.json({ body: "user created" });
+  } catch (error) {
+    if (error === "email exists") {
+      res.json({ body: "email already exists" });
+    } else {
+      res.status(500).json({ body: "internal server error" });
+    }
+  }
+};
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const users = await User.finduser(email, password);
+    if (users.length === 0) {
+      return res.status(401).json({ body: "user not found" });
+    }
+
+    const authToken = jwt.sign(
+      { email: users[0].email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.USER_EXPIRE_TIME,
+      }
+    );
+
+    res.json({ token: authToken, body: "login success" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ body: "internal server error" });
+  }
+};
+
+const googlelogin = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
-    console.log(authToken);
-    res.json({ token: authToken });
+    const payload = ticket.getPayload();
+    const email = payload.email;
+
+    const users = await User.finduser(email);
+    if (users.length === 0) {
+      res.json({ body: "user not found" });
+    } else {
+      const authToken = jwt.sign({ email: email }, process.env.JWT_SECRET, {
+        expiresIn: process.env.USER_EXPIRE_TIME,
+      });
+      res.json({ token: authToken, body: "login success" });
+    }
   } catch (error) {
-    console.error("Error verifying Google token:", error);
     res.status(400).send("Invalid Google token");
   }
 };
 
 const session = async (req, res) => {
-  await fetchData();
-  console.log(req.body);
-  res.json({ body: "session is active" });
+  res.json({ message: "session is active" });
 };
 
 const authenticateJWT = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
-  if (!token) return res.status(401).send("Access Denied");
+  if (!token) return res.status(401).json({ body: "Access Denied" });
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
@@ -67,16 +110,16 @@ const authenticateJWT = (req, res, next) => {
       return res.status(403).json({ body: "invalid token" });
     }
 
-    // If the token is valid, decoded will contain the payload (like email)
-    console.log(decoded); // Log the decoded data, typically { email: 'user@example.com' }
-    req.body = decoded; // Attach the decoded data (email in this case) to the request body
+    req.body.decoded = decoded;
     next();
   });
 };
 
 module.exports = {
+  register,
+  googleregister,
   login,
-  googleauth,
+  googlelogin,
   session,
   authenticateJWT,
 };
