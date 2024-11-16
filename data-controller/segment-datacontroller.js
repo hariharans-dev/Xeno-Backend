@@ -48,6 +48,7 @@ class Segment {
       });
     });
   }
+
   static incrementCustomerCount(segmentId) {
     return new Promise((resolve, reject) => {
       const query =
@@ -59,6 +60,36 @@ class Segment {
           return;
         }
         resolve(results);
+      });
+    });
+  }
+
+  static findallsegment(limit) {
+    return new Promise((resolve, reject) => {
+      const query =
+        "SELECT id, name, conditions, customer_count FROM segment LIMIT ?";
+      connection.query(query, [limit || 999999999], (err, results) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        try {
+          const processedResults = results.map((row) => {
+            let parsedConditions;
+            try {
+              parsedConditions = JSON.parse(row.conditions);
+            } catch (parseError) {
+              parsedConditions = row.conditions;
+            }
+            return {
+              ...row,
+              conditions: parsedConditions,
+            };
+          });
+          resolve(processedResults);
+        } catch (error) {
+          reject(new Error("unexpected error processing results"));
+        }
       });
     });
   }

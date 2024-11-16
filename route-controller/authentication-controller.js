@@ -115,11 +115,22 @@ const authenticateJWT = (req, res, next) => {
   });
 };
 
+const removedatabase = async (req, res) => {
+  try {
+    await User.resetDatabase();
+    res.json({ message: "databases removed" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "internal server error" });
+  }
+};
+
 module.exports = {
+  authenticateJWT,
   register,
   googleregister,
   login,
   googlelogin,
   session,
-  authenticateJWT,
+  removedatabase,
 };

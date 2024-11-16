@@ -1,16 +1,25 @@
 const { subscribeToChannel } = require("./redisclient");
+
+const { create_customer } = require("./route-controller/customer-controller");
 const {
   update_segment_on_customer_addition,
 } = require("./route-controller/segment-controller");
 const {
   check_active_campaign,
 } = require("./route-controller/campaign-controller");
-
 const {
   send_message_to_customer,
 } = require("./route-controller/communication-controller");
 
 subscribeToChannel("create_customer", async (message) => {
+  try {
+    await create_customer(message);
+  } catch (error) {
+    console.error("Error handling message on create_customer:", error);
+  }
+});
+
+subscribeToChannel("update_segment_on_customer_addition", async (message) => {
   try {
     await update_segment_on_customer_addition(message);
   } catch (error) {

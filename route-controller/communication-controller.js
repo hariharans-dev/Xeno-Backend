@@ -22,6 +22,16 @@ const send_message_to_customer = async (data) => {
   }
 };
 
+const display = async (req, res) => {
+  try {
+    const result = await Communication.findcommunication();
+    res.json({ message: "success", data: result });
+  } catch (error) {
+    res.status(500).json({ message: "internal server error" });
+  }
+};
+
 module.exports = {
   send_message_to_customer,
+  display,
 };

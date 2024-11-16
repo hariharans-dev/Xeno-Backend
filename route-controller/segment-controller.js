@@ -96,7 +96,18 @@ const register = async (req, res) => {
   }
 };
 
+const display = async (req, res) => {
+  try {
+    const result = await Segment.findallsegment();
+    res.json({ message: "success", data: result });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "internal server error" });
+  }
+};
+
 module.exports = {
   register,
   update_segment_on_customer_addition,
+  display,
 };

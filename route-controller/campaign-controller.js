@@ -53,7 +53,18 @@ const register = async (req, res) => {
   }
 };
 
+const display = async (req, res) => {
+  try {
+    const result = await Campaign.findcampaign();
+    res.json({ message: "success", data: result });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "internal server error" });
+  }
+};
+
 module.exports = {
-  register,
   check_active_campaign,
+  register,
+  display,
 };

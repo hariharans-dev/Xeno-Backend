@@ -35,6 +35,20 @@ class Customer {
       });
     });
   }
+
+  static findcustomer(limit) {
+    return new Promise((resolve, reject) => {
+      const query =
+        "SELECT name, email, total_spending, visits, last_visit FROM customers LIMIT ?";
+      connection.query(query, [limit || 999999999], (err, results) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(results);
+      });
+    });
+  }
 }
 
 module.exports = { Customer };

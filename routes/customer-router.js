@@ -1,6 +1,30 @@
 const express = require("express");
+const path = require("path");
+const multer = require("multer");
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./uploads");
+  },
+  filename: (req, file, cb) => {
+    const name = Date.now();
+    cb(null, name + path.extname(file.originalname));
+    req.body.filename = name;
+  },
+});
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+}).single("file");
+
 const { check, validationResult } = require("express-validator");
-const { register } = require("../route-controller/customer-controller");
+const {
+  register,
+  register_file,
+  display,
+  display_file,
+} = require("../route-controller/customer-controller");
 const {
   authenticateJWT,
 } = require("../route-controller/authentication-controller");
@@ -17,6 +41,18 @@ const validateregister = [
   check("last_visit").exists().withMessage("Please provide a last visit date"),
   authenticateJWT,
 ];
+const validateregisterfile = [
+  upload,
+  (req, res, next) => {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+    next();
+  },
+  authenticateJWT,
+];
+const validaterdisplay = [authenticateJWT];
+const validaterdisplayfile = [authenticateJWT];
 
 const handlevalidationErrors = (req, res, next) => {
   const errors = validationResult(req);
@@ -27,5 +63,18 @@ const handlevalidationErrors = (req, res, next) => {
 };
 
 router.post("/register", validateregister, handlevalidationErrors, register);
+router.post(
+  "/registerfile",
+  validateregisterfile,
+  handlevalidationErrors,
+  register_file
+);
+router.get("/display", validaterdisplay, handlevalidationErrors, display);
+router.get(
+  "/displayfile",
+  validaterdisplayfile,
+  handlevalidationErrors,
+  display_file
+);
 
 module.exports = router;

@@ -46,6 +46,142 @@ class User {
       });
     });
   }
+
+  static resetDatabase() {
+    return new Promise((resolve, reject) => {
+      // Start by disabling foreign key checks
+      let query = "SET FOREIGN_KEY_CHECKS = 0;";
+      connection.query(query, (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+
+        // Delete all data from the tables
+        const deleteQueries = [
+          "DELETE FROM customers;",
+          "DELETE FROM segment;",
+          "DELETE FROM campaign;",
+          "DELETE FROM communication;",
+        ];
+
+        // Execute all delete queries sequentially
+        Promise.all(
+          deleteQueries.map((query) => {
+            return new Promise((resolve, reject) => {
+              connection.query(query, (err, results) => {
+                if (err) {
+                  return reject(err);
+                }
+                resolve(results);
+              });
+            });
+          })
+        )
+          .then(() => {
+            // Reset AUTO_INCREMENT for 'customers' table
+            const resetQueries = [
+              "ALTER TABLE customers AUTO_INCREMENT = 1;",
+              "ALTER TABLE segment AUTO_INCREMENT = 1;",
+              "ALTER TABLE campaign AUTO_INCREMENT = 1;",
+              "ALTER TABLE communication AUTO_INCREMENT = 1;",
+            ];
+
+            // Execute all reset queries
+            Promise.all(
+              resetQueries.map((query) => {
+                return new Promise((resolve, reject) => {
+                  connection.query(query, (err, results) => {
+                    if (err) {
+                      return reject(err);
+                    }
+                    resolve(results);
+                  });
+                });
+              })
+            )
+              .then(() => {
+                // Re-enable foreign key checks
+                query = "SET FOREIGN_KEY_CHECKS = 1;";
+                connection.query(query, (err, results) => {
+                  if (err) {
+                    return reject(err);
+                  }
+                  resolve(
+                    "Database reset and AUTO_INCREMENT set successfully."
+                  );
+                });
+              })
+              .catch(reject);
+          })
+          .catch(reject);
+      });
+    });
+  }
+
+  static resetDatabase() {
+    return new Promise((resolve, reject) => {
+      let query = "SET FOREIGN_KEY_CHECKS = 0;";
+      connection.query(query, (err, results) => {
+        if (err) {
+          return reject(err);
+        }
+
+        const deleteQueries = [
+          "DELETE FROM customers;",
+          "DELETE FROM segment;",
+          "DELETE FROM campaign;",
+          "DELETE FROM communication;",
+        ];
+
+        Promise.all(
+          deleteQueries.map((query) => {
+            return new Promise((resolve, reject) => {
+              connection.query(query, (err, results) => {
+                if (err) {
+                  return reject(err);
+                }
+                resolve(results);
+              });
+            });
+          })
+        )
+          .then(() => {
+            const resetQueries = [
+              "ALTER TABLE customers AUTO_INCREMENT = 1;",
+              "ALTER TABLE segment AUTO_INCREMENT = 1;",
+              "ALTER TABLE campaign AUTO_INCREMENT = 1;",
+              "ALTER TABLE communication AUTO_INCREMENT = 1;",
+            ];
+
+            Promise.all(
+              resetQueries.map((query) => {
+                return new Promise((resolve, reject) => {
+                  connection.query(query, (err, results) => {
+                    if (err) {
+                      return reject(err);
+                    }
+                    resolve(results);
+                  });
+                });
+              })
+            )
+              .then(() => {
+                query = "SET FOREIGN_KEY_CHECKS = 1;";
+                connection.query(query, (err, results) => {
+                  if (err) {
+                    return reject(err);
+                  }
+                  resolve(
+                    "Database reset and AUTO_INCREMENT set successfully."
+                  );
+                });
+              })
+              .catch(reject);
+          })
+          .catch(reject);
+      });
+    });
+  }
 }
 
 module.exports = { User };

@@ -5,7 +5,6 @@ class Communication {
     return new Promise((resolve, reject) => {
       const query =
         "INSERT INTO communication (campaign_id, customer_id, email, delivery_status, message) VALUES (?, ?, ?, ?, ?)";
-      console.log(campaign_id, customer_id, email, delivery_status, message);
       connection.query(
         query,
         [campaign_id, customer_id, email, delivery_status, message],
@@ -18,6 +17,19 @@ class Communication {
           resolve(results);
         }
       );
+    });
+  }
+  static findcommunication(limit) {
+    return new Promise((resolve, reject) => {
+      const query =
+        "SELECT campaign_id, email, delivery_status, delivery_date, message FROM communication LIMIT ?";
+      connection.query(query, [limit || 999999999], (err, results) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(results);
+      });
     });
   }
 }

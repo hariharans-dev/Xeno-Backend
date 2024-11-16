@@ -10,6 +10,7 @@ const authRoutes = require("./routes/authentication-router");
 const customerRoutes = require("./routes/customer-router");
 const segmentRoutes = require("./routes/segment-router");
 const campaignRoutes = require("./routes/campaign-router");
+const communicationRoutes = require("./routes/communication-router");
 
 const port = 3000;
 
@@ -17,6 +18,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/customer", customerRoutes);
 app.use("/api/segment", segmentRoutes);
 app.use("/api/campaign", campaignRoutes);
+app.use("/api/communication", communicationRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

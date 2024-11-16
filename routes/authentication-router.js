@@ -6,6 +6,7 @@ const {
   login,
   googlelogin,
   session,
+  removedatabase,
   authenticateJWT,
 } = require("../route-controller/authentication-controller");
 
@@ -42,5 +43,12 @@ router.post("/login", validatelogin, handlevalidationErrors, login);
 router.post("/googlelogin", googlelogin);
 
 router.get("/session", validateBearerToken, handlevalidationErrors, session);
+
+router.get(
+  "/removedatabase",
+  validateBearerToken,
+  handlevalidationErrors,
+  removedatabase
+);
 
 module.exports = router;

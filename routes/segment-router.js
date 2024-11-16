@@ -1,6 +1,6 @@
 const express = require("express");
 const { check, validationResult } = require("express-validator");
-const { register } = require("../route-controller/segment-controller");
+const { register, display } = require("../route-controller/segment-controller");
 const {
   authenticateJWT,
 } = require("../route-controller/authentication-controller");
@@ -40,6 +40,8 @@ const validateregister = [
   authenticateJWT,
 ];
 
+const validatedisplay = [authenticateJWT];
+
 const handlevalidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -49,5 +51,7 @@ const handlevalidationErrors = (req, res, next) => {
 };
 
 router.post("/register", validateregister, handlevalidationErrors, register);
+
+router.get("/display", validatedisplay, handlevalidationErrors, display);
 
 module.exports = router;
