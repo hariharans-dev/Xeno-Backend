@@ -1,3 +1,4 @@
+require("dotenv").config({ path: env });
 const { subscribeToChannel } = require("./redisclient");
 
 const { create_customer } = require("./route-controller/customer-controller");
@@ -43,7 +44,6 @@ subscribeToChannel("check_active_campaign", async (message) => {
 });
 
 subscribeToChannel("send_message_to_customer", async (message) => {
-  console.log("send message", message);
   try {
     try {
       await send_message_to_customer(message);
