@@ -12,7 +12,7 @@ const {
 } = require("./route-controller/communication-controller");
 
 subscribeToChannel("create_customer", async (message) => {
-  console.log("create customer")
+  console.log("create customer", message);
   try {
     await create_customer(message);
   } catch (error) {
@@ -21,6 +21,7 @@ subscribeToChannel("create_customer", async (message) => {
 });
 
 subscribeToChannel("update_segment_on_customer_addition", async (message) => {
+  console.log("update segment", message);
   try {
     await update_segment_on_customer_addition(message);
   } catch (error) {
@@ -29,6 +30,7 @@ subscribeToChannel("update_segment_on_customer_addition", async (message) => {
 });
 
 subscribeToChannel("check_active_campaign", async (message) => {
+  console.log("check active campaign", message);
   try {
     try {
       await check_active_campaign(message);
@@ -41,6 +43,7 @@ subscribeToChannel("check_active_campaign", async (message) => {
 });
 
 subscribeToChannel("send_message_to_customer", async (message) => {
+  console.log("send message", message);
   try {
     try {
       await send_message_to_customer(message);
