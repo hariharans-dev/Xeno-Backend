@@ -68,6 +68,7 @@ const update_segment_on_customer_addition = async (data) => {
 
 const register = async (req, res) => {
   const { name, conditions } = req.body;
+  console.log(req.body);
 
   var query =
     conditions[0].field +

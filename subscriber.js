@@ -12,6 +12,7 @@ const {
 } = require("./route-controller/communication-controller");
 
 subscribeToChannel("create_customer", async (message) => {
+  console.log("create customer")
   try {
     await create_customer(message);
   } catch (error) {

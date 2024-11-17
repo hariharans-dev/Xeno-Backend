@@ -65,6 +65,7 @@ const register_file = async (req, res) => {
 
 const create_customer = async (data) => {
   const { name, email, total_spending, visits, last_visit } = data;
+  console.log(data);
   const result = await Customer.createcustomer(
     name,
     email,
