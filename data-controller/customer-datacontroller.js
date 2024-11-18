@@ -36,6 +36,19 @@ class Customer {
     });
   }
 
+  static get_customer(condition) {
+    return new Promise((resolve, reject) => {
+      const query = `SELECT id, email FROM customers WHERE ${condition}`;
+      connection.query(query, (err, results) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve(results);
+      });
+    });
+  }
+
   static findcustomer(limit) {
     return new Promise((resolve, reject) => {
       const query =

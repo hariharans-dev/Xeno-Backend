@@ -19,34 +19,64 @@ class Segment {
       );
     });
   }
-  static findsegment() {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT id, conditions FROM segment";
+  static findsegment(id = null) {
+    if (id === null) {
+      return new Promise((resolve, reject) => {
+        const query = "SELECT id, conditions FROM segment";
 
-      connection.query(query, (err, results) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        try {
-          const processedResults = results.map((row) => {
-            let parsedConditions;
-            try {
-              parsedConditions = JSON.parse(row.conditions);
-            } catch (parseError) {
-              parsedConditions = row.conditions;
-            }
-            return {
-              ...row,
-              conditions: parsedConditions,
-            };
-          });
-          resolve(processedResults);
-        } catch (error) {
-          reject(new Error("unexpected error processing results"));
-        }
+        connection.query(query, (err, results) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          try {
+            const processedResults = results.map((row) => {
+              let parsedConditions;
+              try {
+                parsedConditions = JSON.parse(row.conditions);
+              } catch (parseError) {
+                parsedConditions = row.conditions;
+              }
+              return {
+                ...row,
+                conditions: parsedConditions,
+              };
+            });
+            resolve(processedResults);
+          } catch (error) {
+            reject(new Error("unexpected error processing results"));
+          }
+        });
       });
-    });
+    } else {
+      return new Promise((resolve, reject) => {
+        const query = "SELECT conditions FROM segment where id = (?)";
+
+        connection.query(query, [id], (err, results) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          try {
+            const processedResults = results.map((row) => {
+              let parsedConditions;
+              try {
+                parsedConditions = JSON.parse(row.conditions);
+              } catch (parseError) {
+                parsedConditions = row.conditions;
+              }
+              return {
+                ...row,
+                conditions: parsedConditions,
+              };
+            });
+            resolve(processedResults);
+          } catch (error) {
+            reject(new Error("unexpected error processing results"));
+          }
+        });
+      });
+    }
   }
 
   static incrementCustomerCount(segmentId) {
